@@ -39,15 +39,21 @@ NSString * DescriptionFromKeyboardTracker(NgKeyboardTracker * tracker) {
     [self setupViews];
     
     _coordinator = [[NgKeyboardTracker sharedTracker] createPseudoInputAccessoryViewCoordinator];
-    [_coordinator trackInteractiveKeyboardDismissalForTextView:_textView];
+    [_coordinator setPseudoInputAccessoryViewHeight:44.f];
     
     [[NgKeyboardTracker sharedTracker] addDelegate:self];
   }
   return self;
 }
 - (void)dealloc {
-  [_coordinator endTracking];
+
   [[NgKeyboardTracker sharedTracker] removeDelegate:self];
+}
+- (BOOL)canBecomeFirstResponder {
+  return YES;
+}
+- (UIView *)inputAccessoryView {
+  return _coordinator.pseudoInputAccessoryView;
 }
 - (void)setupViews {
   _scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
@@ -80,9 +86,9 @@ NSString * DescriptionFromKeyboardTracker(NgKeyboardTracker * tracker) {
 }
 - (void)layoutTextView {
   
-  CGRect kbframe = [[NgKeyboardTracker sharedTracker] keyboardEndFrameForView:self];
+  CGRect kbframe = [[NgKeyboardTracker sharedTracker] keyboardCurrentFrameForView:self];
   CGSize s = self.frame.size;
-  CGFloat textViewH = 44;
+  CGFloat textViewH = _coordinator.pseudoInputAccessoryViewHeight;
   CGFloat bottomPadding = -textViewH;
   
   if (!CGRectEqualToRect(CGRectZero, kbframe)) {
@@ -100,7 +106,8 @@ NSString * DescriptionFromKeyboardTracker(NgKeyboardTracker * tracker) {
 
   UIView * border = [_textView viewWithTag:1000];
   border.frame = (CGRect) { 0, 0, _textView.frame.size.width, .6 };
-  [_coordinator setPseudoInputAccessoryViewFrame:_textView.bounds];
+  
+  [_coordinator setPseudoInputAccessoryViewHeight:textViewH];
 }
 - (void)layoutSubviews {
   
@@ -127,25 +134,20 @@ NSString * DescriptionFromKeyboardTracker(NgKeyboardTracker * tracker) {
   };
   
 }
-- (void)keyboardTrackerDidChangeAppearanceState:(NgKeyboardTracker *)tracker {
+- (void)performUpdate:(NgKeyboardTracker *)tracker {
   _label.text = DescriptionFromKeyboardTracker(tracker);
   [UIView animateWithDuration:tracker.animationDuration
                         delay:0
                       options:tracker.animationOptions
                    animations:^{
                      [self layoutTextView];
-                   }
-                   completion:nil];
+                   } completion:nil];
+}
+- (void)keyboardTrackerDidChangeAppearanceState:(NgKeyboardTracker *)tracker {
+  [self performUpdate:tracker];
 }
 - (void)keyboardTrackerDidUpdate:(NgKeyboardTracker *)tracker {
-  _label.text = DescriptionFromKeyboardTracker(tracker);
-  [UIView animateWithDuration:tracker.animationDuration
-                        delay:0
-                      options:tracker.animationOptions
-                   animations:^{
-                     [self layoutTextView];
-                   }
-                   completion:nil];
+  [self performUpdate:tracker];
 }
 @end
 
@@ -160,14 +162,24 @@ NSString * DescriptionFromKeyboardTracker(NgKeyboardTracker * tracker) {
   
   _layoutView = [[LayoutView alloc] initWithFrame:self.view.bounds];
   _layoutView.autoresizingMask = ~UIViewAutoresizingNone;
-  [self.view addSubview:_layoutView];
+  self.view = _layoutView;
+  [_layoutView becomeFirstResponder];
 }
 - (void)viewDidLoad {
   [super viewDidLoad];
 
   [_layoutView.button addTarget:self action:@selector(onButtonTap:) forControlEvents:UIControlEventTouchUpInside];
 }
-
+- (void)viewDidAppear:(BOOL)animated {
+  [super viewDidAppear:animated];
+  
+  // uncomment following codes to change textView's height
+  /*
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    _layoutView.coordinator.pseudoInputAccessoryViewHeight = 88.f;
+  });
+  */
+}
 - (void)onButtonTap:(id)sender {
   [_layoutView.textView resignFirstResponder];
 }

@@ -34,6 +34,7 @@ typedef NS_ENUM(int32_t, NgKeyboardTrackerKeyboardAppearanceState) {
 // frames
 @property (nonatomic, readonly) CGRect                                    beginFrame;
 @property (nonatomic, readonly) CGRect                                    endFrame;
+@property (nonatomic, readonly) CGRect                                    currentFrame;
 
 // animation
 @property (nonatomic, readonly) NSTimeInterval                            animationDuration;
@@ -52,5 +53,5 @@ typedef NS_ENUM(int32_t, NgKeyboardTrackerKeyboardAppearanceState) {
 @end
 
 @interface NgKeyboardTracker (UIView)
-- (CGRect)keyboardEndFrameForView:(UIView *)view;
+- (CGRect)keyboardCurrentFrameForView:(UIView *)view;
 @end

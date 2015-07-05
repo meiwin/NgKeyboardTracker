@@ -51,19 +51,29 @@ Keyboard tracker's properties:
 - `appearanceState` : current appearance state
 - `beginFrame` : last known begin frame
 - `endFrame`: last known frame
+- `currentFrame`: last known current keyboard's frame
 - `animationDuration`: last known animation duration
 - `animationCurve`: last known animation curve
 - `animationOptions` : derived from `animationCurve` for convenience
+
+P.S. keyboard's `frame.size.height` system's keyboard height plus `inputAccessoryView` height.
 
 ### Pseudo input accessory view coordinator
 
 `NgPseudoInputAccessoryViewCoordinator` is `NgKeyboardTracker` extension that makes it easier to implement iMessage's text input behavior in iOS 7 with `UIScrollViewKeyboardDismissModeInteractive` and persistent `inputAccessoryView`.
 
-1. Set `UIScrollView`'s keyboard dismiss mode to `UIScrollViewKeyboardDismissModeInteractive`.
-2. Create `NgPseudoInputAccessoryViewCoordinator` by calling `-createPseudoInputAccessoryViewCoordinator`.
-3. Track `UITextView` or `UITextField` with coordinator's `-trackInteractiveKeyboardDismissalForTextView:` or `-trackInteractiveKeyboardDismissalForTextField:`.
-4. Set desired height of input accessory view with `-setPseudoInputAccessoryViewFrame:` each time it changes.
-5. Layout view to emulate 'sticky' input accessory view on ever keyboard updates.
-6. Make sure to call coordinator's `-endTracking` at the end
+The view controller:
+
+1. Override `loadView` to set custom UIView implementation.
+2. Make sure to call the custom view's `becomeFirstResponder`.
+
+The custom view:
+
+1. Create `NgPseudoInputAccessoryViewCoordinator` by calling `-createPseudoInputAccessoryViewCoordinator`.
+2. Overrides `-canBecomeFirstResponder`, returns `YES`.
+3. Overrides `-inputAccessoryView`, returns coordinator's `pseudoInputAccessoryView`.
+4. Set `UIScrollView`'s keyboard dismiss mode to `UIScrollViewKeyboardDismissModeInteractive`.
+5. Set desired height of input accessory view with `-setPseudoInputAccessoryViewHeight:`.
+6. Layout keyboard's bar accordingly using information from `NgKeyboardTracker` in `layoutSubviews`.
 
 P.S. See demo application for example.

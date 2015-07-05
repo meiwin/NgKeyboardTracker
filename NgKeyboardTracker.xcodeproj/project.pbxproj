@@ -18,6 +18,16 @@
 		DCEDECE51B46E52500C5CB27 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DCEDECE41B46E52500C5CB27 /* Default-568h@2x.png */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		DCE2F5581B4977FE0015DF98 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC2EF7441B40E69C0068858F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DC2EF74B1B40E69C0068858F;
+			remoteInfo = NgKeyboardTracker;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		DC2EF74A1B40E69C0068858F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -43,6 +53,9 @@
 		DC2EF7741B40E6CF0068858F /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		DC2EF7751B40E6CF0068858F /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		DC2EF77A1B40E6CF0068858F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		DCE2F55A1B4983850015DF98 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		DCE2F55B1B49839F0015DF98 /* NgKeyboardTracker.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = NgKeyboardTracker.podspec; sourceTree = "<group>"; };
+		DCE2F55C1B49839F0015DF98 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		DCEDECE01B46D90300C5CB27 /* NgPseudoInputAccessoryViewCoordinator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NgPseudoInputAccessoryViewCoordinator.h; sourceTree = "<group>"; };
 		DCEDECE11B46D90300C5CB27 /* NgPseudoInputAccessoryViewCoordinator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NgPseudoInputAccessoryViewCoordinator.m; sourceTree = "<group>"; };
 		DCEDECE31B46D9DA00C5CB27 /* NgPseudoInputAccessoryViewCoordinatorPrivates.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NgPseudoInputAccessoryViewCoordinatorPrivates.h; sourceTree = "<group>"; };
@@ -75,6 +88,9 @@
 				DC2EF74E1B40E69C0068858F /* NgKeyboardTracker */,
 				DC2EF76C1B40E6CF0068858F /* NgKeyboardTrackerDemo */,
 				DC2EF74D1B40E69C0068858F /* Products */,
+				DCE2F55B1B49839F0015DF98 /* NgKeyboardTracker.podspec */,
+				DCE2F55C1B49839F0015DF98 /* LICENSE */,
+				DCE2F55A1B4983850015DF98 /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -152,6 +168,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				DCE2F5591B4977FE0015DF98 /* PBXTargetDependency */,
 			);
 			name = NgKeyboardTrackerDemo;
 			productName = NgKeyboardTrackerDemo;
@@ -227,6 +244,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DCE2F5591B4977FE0015DF98 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DC2EF74B1B40E69C0068858F /* NgKeyboardTracker */;
+			targetProxy = DCE2F5581B4977FE0015DF98 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		DC2EF75E1B40E69C0068858F /* Debug */ = {

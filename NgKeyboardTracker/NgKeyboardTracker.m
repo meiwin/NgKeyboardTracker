@@ -25,57 +25,6 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
 }
 
 #pragma mark -
-@class NgKeyboardTrackerMonitor;
-@protocol NgKeyboardTrackerMonitorDelegate
-- (void)keyboardTrackerMonitorDidRun:(NgKeyboardTrackerMonitor *)monitor;
-@end
-
-@interface NgKeyboardTrackerMonitor : NSObject <NSMachPortDelegate> {
-  struct {
-    int didRun;
-  } _delegateFlags;
-  NSDictionary * _lastRunInfo;
-}
-@property (nonatomic, strong, readonly) NSMachPort * port;
-@property (nonatomic, strong) NSDictionary * info;
-@property (nonatomic, weak) id<NgKeyboardTrackerMonitorDelegate> delegate;
-@end
-
-@implementation NgKeyboardTrackerMonitor
-- (instancetype)init {
-  self = [super init];
-  if (self) {
-    
-    _port = [[NSMachPort alloc] init];
-    _port.delegate = self;
-    [[NSRunLoop mainRunLoop] addPort:_port forMode:NSRunLoopCommonModes];
-  }
-  return self;
-}
-- (void)dealloc {
-  _port.delegate = nil;
-  [_port removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-}
-- (void)setDelegate:(id<NgKeyboardTrackerMonitorDelegate>)delegate {
-  _delegate = delegate;
-  _delegateFlags.didRun = _delegate && [(id)_delegate respondsToSelector:@selector(keyboardTrackerMonitorDidRun:)];
-}
-- (void)didRun {
-  if (_delegateFlags.didRun) [_delegate keyboardTrackerMonitorDidRun:self];
-}
-- (void)setInfo:(NSDictionary *)info {
-  _info = info;
-  [self.port sendBeforeDate:[NSDate date] components:nil from:nil reserved:0];
-}
-- (void)handleMachMessage:(void *)msg {
-  if (![_lastRunInfo isEqual:_info]) {
-    [self didRun];
-    _lastRunInfo = _info;
-  }
-}
-@end
-
-#pragma mark -
 @interface NgKeyboardTrackerDelegateWrapper : NSObject {
   struct {
     int didChangeAppearanceState, didUpdate;
@@ -138,12 +87,12 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
 @end
 
 #pragma mark -
-@interface NgKeyboardTracker () <NgKeyboardTrackerMonitorDelegate, NgPseudoInputAccessoryViewCoordinatorDelegate> {
+@interface NgKeyboardTracker () <NgPseudoInputAccessoryViewCoordinatorDelegate> {
   
   BOOL _tracking;
-  NgKeyboardTrackerMonitor * _monitor;
   NSMutableArray * _delegates;
   NSRecursiveLock * _lock;
+
 }
 @end
 
@@ -163,14 +112,11 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
   if (self) {
     _delegates = [NSMutableArray array];
     _lock = [[NSRecursiveLock alloc] init];
-    _monitor = [[NgKeyboardTrackerMonitor alloc] init];
-    _monitor.delegate = self;
     [self getInitialKeyboardInfo];
   }
   return self;
 }
 - (void)dealloc {
-  _monitor = nil;
   [self stop];
 }
 - (UIView *)getKeyboardView {
@@ -254,10 +200,11 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
 #pragma mark Internal
 - (void)updateAppearanceState:(NgKeyboardTrackerKeyboardAppearanceState)newState {
   _appearanceState = newState;
-
+  [_lock lock];
   for (NgKeyboardTrackerDelegateWrapper * wrapper in [_delegates copy]) {
     [wrapper didChangeAppearanceState];
   }
+  [_lock unlock];
 }
 - (void)updateAppearanceStateIfValid:(NgKeyboardTrackerKeyboardAppearanceState)newState {
   
@@ -278,9 +225,12 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
 
 #pragma mark Events
 - (void)notifyAllDelegates {
+  
+  [_lock lock];
   for (NgKeyboardTrackerDelegateWrapper * wrapper in [_delegates copy]) {
     [wrapper didUpdate];
   }
+  [_lock unlock];
 }
 - (void)setAnimationCurve:(UIViewAnimationCurve)animationCurve {
   _animationCurve = animationCurve;
@@ -289,37 +239,34 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
 - (void)captureInfo:(NSDictionary *)info {
   _beginFrame = [info[UIKeyboardFrameBeginUserInfoKey] CGRectValue];
   _endFrame = [info[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+  _currentFrame = _endFrame;
   _animationDuration = [info[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
   [self setAnimationCurve:(UIViewAnimationCurve)[info[UIKeyboardAnimationCurveUserInfoKey] integerValue]];
-  
-  [self notifyAllDelegates];
 }
 - (void)onKeyboardWillShow:(NSNotification *)note {
+  [self captureInfo:note.userInfo];
   [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateWillShow];
-  _monitor.info = note.userInfo;
-}
-- (void)onKeyboardWillHide:(NSNotification *)note {
-  [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateWillHide];
-  _monitor.info = note.userInfo;
-}
-- (void)onKeyboardWillChangeFrame:(NSNotification *)note {
-  _monitor.info = note.userInfo;
 }
 - (void)onKeyboardDidShow:(NSNotification *)note {
+  [self captureInfo:note.userInfo];
   [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateShown];
-  _monitor.info = note.userInfo;
+}
+- (void)onKeyboardWillHide:(NSNotification *)note {
+  [self captureInfo:note.userInfo];
+  [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateWillHide];
 }
 - (void)onKeyboardDidHide:(NSNotification *)note {
+  [self captureInfo:note.userInfo];
   [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateHidden];
-  _monitor.info = note.userInfo;
-}
-- (void)onKeyboardDidChangeFrame:(NSNotification *)note {
-  _monitor.info = note.userInfo;
 }
 
-#pragma mark NgKeyboardTrackerMonitorDelegate
-- (void)keyboardTrackerMonitorDidRun:(NgKeyboardTrackerMonitor *)monitor {
-  [self captureInfo:monitor.info];
+- (void)onKeyboardWillChangeFrame:(NSNotification *)note {
+  [self captureInfo:note.userInfo];
+  [self notifyAllDelegates];
+}
+- (void)onKeyboardDidChangeFrame:(NSNotification *)note {
+  [self captureInfo:note.userInfo];
+  [self notifyAllDelegates];
 }
 
 #pragma mark Delegates
@@ -348,26 +295,25 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
 }
 
 #pragma mark UIView
-- (CGRect)keyboardEndFrameForView:(UIView *)view {
-  
+- (CGRect)rectFromFrame:(CGRect)frame forView:(UIView *)view {
   NSParameterAssert(view);
-  if (CGRectEqualToRect(CGRectZero, _endFrame) ||
-      _appearanceState == NgKeyboardTrackerKeyboardAppearanceStateHidden)
+  if (CGRectEqualToRect(CGRectZero, frame))
     return CGRectZero;
   
-  return [[UIApplication sharedApplication].keyWindow convertRect:_endFrame toView:view];
+  return [[UIApplication sharedApplication].keyWindow convertRect:frame toView:view];
+}
+- (CGRect)keyboardCurrentFrameForView:(UIView *)view {
+
+  return [self rectFromFrame:_currentFrame forView:view];
 }
 
 #pragma mark NgPseudoInputAccessoryViewCoordinatorDelegate
 - (void)pseudoInputAccessoryViewCoordinator:(NgPseudoInputAccessoryViewCoordinator *)coordinator
         keyboardFrameDidChangeInteractively:(CGRect)frame {
   
-  _beginFrame = frame;
-  _endFrame = frame;
+  _currentFrame = frame;
   _animationDuration = 0;
   [self notifyAllDelegates];
 }
-- (void)pseudoInputAccessoryViewCoordinatorDidSetFrame:(NgPseudoInputAccessoryViewCoordinator *)coordinator {
-  // nothing to do here because UIKeyboardWillChangeFrameNotification will fire
-}
+
 @end

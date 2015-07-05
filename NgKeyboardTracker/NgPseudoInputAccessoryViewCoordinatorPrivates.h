@@ -11,7 +11,8 @@
 
 @protocol NgPseudoInputAccessoryViewCoordinatorDelegate
 @optional
-- (void)pseudoInputAccessoryViewCoordinatorDidSetFrame:(NgPseudoInputAccessoryViewCoordinator *)coordinator;
+- (void)pseudoInputAccessoryViewCoordinator:(NgPseudoInputAccessoryViewCoordinator *)coordinator
+                               didSetHeight:(CGFloat)height;
 - (void)pseudoInputAccessoryViewCoordinator:(NgPseudoInputAccessoryViewCoordinator *)coordinator
         keyboardFrameDidChangeInteractively:(CGRect)frame;
 @end

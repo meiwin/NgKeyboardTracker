@@ -19,8 +19,12 @@
 
 @interface NgPseudoInputAccessoryView : UIView {
   struct { int keyboardFrameDidChange; } _delegateFlags;
+
+  CGFloat _height;
+  NSLayoutConstraint * _heightConstraint;
 }
 @property (nonatomic, weak) id<NgPseudoInputAccessoryViewDelegate> delegate;
+@property (nonatomic) CGFloat height;
 @end
 
 @implementation NgPseudoInputAccessoryView
@@ -45,6 +49,21 @@
   [self.superview removeObserver:self forKeyPath:sel];
   [aSuperview addObserver:self forKeyPath:sel options:0 context:nil];
 }
+- (void)didMoveToSuperview {
+  [super didMoveToSuperview];
+  
+  __block NSLayoutConstraint * heightConstraint = nil;
+  [self.constraints enumerateObjectsUsingBlock:^(NSLayoutConstraint * constraint, NSUInteger idx, BOOL *stop) {
+    if (constraint.firstItem == self &&
+        constraint.firstAttribute == NSLayoutAttributeHeight &&
+        constraint.relation == NSLayoutRelationEqual) {
+      heightConstraint = constraint;
+      *stop = YES;
+    }
+  }];
+  _heightConstraint = heightConstraint;
+  _heightConstraint.constant = _height;
+}
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
   if (object == self.superview && [keyPath isEqualToString:[self selectorForSuperview]]) {
@@ -56,12 +75,20 @@
   NSString *sel = [self selectorForSuperview];
   [self.superview removeObserver:self forKeyPath:sel];
 }
+- (void)setHeight:(CGFloat)height {
+  if (_height == height) return;
+  _height = height;
+  _heightConstraint.constant = height;
+}
+- (CGFloat)height {
+  return _height;
+}
 @end
 
 #pragma mark -
 @interface NgPseudoInputAccessoryViewCoordinator () <NgPseudoInputAccessoryViewDelegate> {
   struct {
-    int didSetFrame;
+    int didSetHeight;
     int keyboardFrameDidChange;
   } _delegateFlags;
   
@@ -69,7 +96,6 @@
   BOOL _tracking;
   __weak id<NgPseudoInputAccessoryViewCoordinatorDelegate> _delegate;
 }
-@property (nonatomic, strong, readonly) NgPseudoInputAccessoryView * inputAccessoryView;
 @end
 
 @implementation NgPseudoInputAccessoryViewCoordinator
@@ -77,23 +103,24 @@
 - (instancetype)_init {
   self = [super init];
   if (self) {
-    _inputAccessoryView = [NgPseudoInputAccessoryView new];
-    _inputAccessoryView.backgroundColor = [UIColor clearColor];
-    _inputAccessoryView.userInteractionEnabled = NO;
-    _inputAccessoryView.delegate = self;
+    _pseudoInputAccessoryView = [NgPseudoInputAccessoryView new];
+    _pseudoInputAccessoryView.backgroundColor = [UIColor clearColor];
+    _pseudoInputAccessoryView.userInteractionEnabled = NO;
+    ((NgPseudoInputAccessoryView *)_pseudoInputAccessoryView).delegate = self;
   }
   return self;
 }
 - (void)dealloc {
-  _inputAccessoryView.delegate = nil;
+  ((NgPseudoInputAccessoryView *)_pseudoInputAccessoryView).delegate = nil;
+  _pseudoInputAccessoryView = nil;
 }
 - (void)setDelegate:(id<NgPseudoInputAccessoryViewCoordinatorDelegate>)delegate {
   _delegate = delegate;
-  _delegateFlags.didSetFrame = delegate && [(id)delegate respondsToSelector:@selector(pseudoInputAccessoryViewCoordinatorDidSetFrame:)];
+  _delegateFlags.didSetHeight = delegate && [(id)delegate respondsToSelector:@selector(pseudoInputAccessoryViewCoordinator:didSetHeight:)];
   _delegateFlags.keyboardFrameDidChange = delegate && [(id)delegate respondsToSelector:@selector(pseudoInputAccessoryViewCoordinator:keyboardFrameDidChangeInteractively:)];
 }
-- (void)didSetFrame {
-  if (_delegateFlags.didSetFrame) [_delegate pseudoInputAccessoryViewCoordinatorDidSetFrame:self];
+- (void)didSetHeight:(CGFloat)height {
+  if (_delegateFlags.didSetHeight) [_delegate pseudoInputAccessoryViewCoordinator:self didSetHeight:height];
 }
 - (void)keyboardFrameDidChangeInteractively:(CGRect)frame {
   if (_delegateFlags.keyboardFrameDidChange) [_delegate pseudoInputAccessoryViewCoordinator:self keyboardFrameDidChangeInteractively:frame];
@@ -104,36 +131,11 @@
 }
 
 #pragma mark Public
-- (void)setPseudoInputAccessoryViewFrame:(CGRect)frame {
-  self.inputAccessoryView.frame = frame;
-  [self didSetFrame];
+- (void)setPseudoInputAccessoryViewHeight:(CGFloat)height {
+  [(NgPseudoInputAccessoryView *)_pseudoInputAccessoryView setHeight:height];
+  [self didSetHeight:height];
 }
-- (void)trackInteractiveKeyboardDismissalForTextView:(UITextView *)textView {
-  NSParameterAssert(textView);
-  NSAssert(!_tracking, @"Invalid state: already tracking other responder.");
-  _weakTrackedResponder = textView;
-  textView.inputAccessoryView = _inputAccessoryView;
-  _tracking = YES;
-}
-- (void)trackInteractiveKeyboardDismissalForTextField:(UITextField *)textField {
-  NSParameterAssert(textField);
-  NSAssert(!_tracking, @"Invalid state: already tracking other responder.");
-  _weakTrackedResponder = textField;
-  textField.inputAccessoryView = _inputAccessoryView;
-  _tracking = YES;
-}
-- (void)endTracking {
-  __strong UIResponder * strongResponder = _weakTrackedResponder;
-  if (strongResponder) {
-    if ([strongResponder isKindOfClass:[UITextView class]]) {
-      ((UITextView *)strongResponder).inputAccessoryView = nil;
-    } else if ([strongResponder isKindOfClass:[UITextField class]]) {
-      ((UITextField *)strongResponder).inputAccessoryView = nil;
-    } else {
-      NSAssert(NO, @"Invalid state: responder is neither a UITextView or UITextField.");
-    }
-    _tracking = NO;
-    _weakTrackedResponder = nil;
-  }
+- (CGFloat)pseudoInputAccessoryViewHeight {
+  return [(NgPseudoInputAccessoryView *)_pseudoInputAccessoryView height];
 }
 @end

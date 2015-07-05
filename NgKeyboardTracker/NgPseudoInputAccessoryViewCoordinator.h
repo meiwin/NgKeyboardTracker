@@ -10,9 +10,8 @@
 #import <UIKit/UIKit.h>
 
 @interface NgPseudoInputAccessoryViewCoordinator : NSObject
+@property (nonatomic, strong, readonly) UIView * pseudoInputAccessoryView;
 - (instancetype)init UNAVAILABLE_ATTRIBUTE;
-- (void)setPseudoInputAccessoryViewFrame:(CGRect)frame;
-- (void)trackInteractiveKeyboardDismissalForTextView:(UITextView *)textView;
-- (void)trackInteractiveKeyboardDismissalForTextField:(UITextField *)textField;
-- (void)endTracking;
+- (void)setPseudoInputAccessoryViewHeight:(CGFloat)height;
+- (CGFloat)pseudoInputAccessoryViewHeight;
 @end
