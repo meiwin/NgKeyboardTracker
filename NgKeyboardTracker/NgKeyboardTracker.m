@@ -75,11 +75,13 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
   return YES;
 }
 - (void)didChangeAppearanceState {
+  if (!_delegateFlags.didChangeAppearanceState) return;
   [self performSafely:^(NgKeyboardTracker * tracker, id<NgKeyboardTrackerDelegate> delegate) {
     [delegate keyboardTrackerDidChangeAppearanceState:tracker];
   }];
 }
 - (void)didUpdate {
+  if (!_delegateFlags.didUpdate) return;
   [self performSafely:^(NgKeyboardTracker * tracker, id<NgKeyboardTrackerDelegate> delegate) {
     [delegate keyboardTrackerDidUpdate:tracker];
   }];
