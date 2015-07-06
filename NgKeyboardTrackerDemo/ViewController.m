@@ -19,9 +19,10 @@ NSString * AppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState stat
 }
 
 NSString * DescriptionFromKeyboardTracker(NgKeyboardTracker * tracker) {
-  return [NSString stringWithFormat:@"[%@]\n%@"
+  return [NSString stringWithFormat:@"[%@]\n%@\nvisible: %@"
           , AppearanceStateAsString(tracker.appearanceState)
-          , NSStringFromCGRect(tracker.endFrame)];
+          , NSStringFromCGRect(tracker.endFrame)
+          , [tracker isKeyboardVisible] ? @"YES" : @"NO" ];
 }
 
 @interface LayoutView : UIView <NgKeyboardTrackerDelegate>

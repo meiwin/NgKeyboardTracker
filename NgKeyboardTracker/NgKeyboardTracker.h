@@ -49,6 +49,7 @@ typedef NS_ENUM(int32_t, NgKeyboardTrackerKeyboardAppearanceState) {
 - (void)removeDelegate:(id<NgKeyboardTrackerDelegate>)delegate;
 
 - (NgPseudoInputAccessoryViewCoordinator *)createPseudoInputAccessoryViewCoordinator;
+- (BOOL)isKeyboardVisible;
 
 @end
 

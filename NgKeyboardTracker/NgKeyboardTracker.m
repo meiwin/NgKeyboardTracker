@@ -92,7 +92,7 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
   BOOL _tracking;
   NSMutableArray * _delegates;
   NSRecursiveLock * _lock;
-
+  CGFloat _inputAccessoryViewHeight;
 }
 @end
 
@@ -222,6 +222,10 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
         newState != NgKeyboardTrackerKeyboardAppearanceStateHidden) [self updateAppearanceState:newState];
   }
 }
+- (BOOL)isKeyboardVisible {
+  CGRect intersection = CGRectIntersection([UIScreen mainScreen].bounds, _currentFrame);
+  return intersection.size.height - _inputAccessoryViewHeight > 0;
+}
 
 #pragma mark Events
 - (void)notifyAllDelegates {
@@ -315,5 +319,8 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
   _animationDuration = 0;
   [self notifyAllDelegates];
 }
-
+- (void)pseudoInputAccessoryViewCoordinator:(NgPseudoInputAccessoryViewCoordinator *)coordinator
+                               didSetHeight:(CGFloat)height {
+  _inputAccessoryViewHeight = height;
+}
 @end
