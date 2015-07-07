@@ -138,4 +138,7 @@
 - (CGFloat)pseudoInputAccessoryViewHeight {
   return [(NgPseudoInputAccessoryView *)_pseudoInputAccessoryView height];
 }
+- (BOOL)isActive {
+  return _pseudoInputAccessoryView.superview != nil;
+}
 @end

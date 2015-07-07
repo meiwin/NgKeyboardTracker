@@ -14,4 +14,5 @@
 - (instancetype)init UNAVAILABLE_ATTRIBUTE;
 - (void)setPseudoInputAccessoryViewHeight:(CGFloat)height;
 - (CGFloat)pseudoInputAccessoryViewHeight;
+- (BOOL)isActive;
 @end
