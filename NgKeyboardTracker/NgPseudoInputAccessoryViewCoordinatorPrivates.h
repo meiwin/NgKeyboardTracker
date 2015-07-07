@@ -14,7 +14,7 @@
 - (void)pseudoInputAccessoryViewCoordinator:(NgPseudoInputAccessoryViewCoordinator *)coordinator
                                didSetHeight:(CGFloat)height;
 - (void)pseudoInputAccessoryViewCoordinator:(NgPseudoInputAccessoryViewCoordinator *)coordinator
-        keyboardFrameDidChangeInteractively:(CGRect)frame;
+                     keyboardFrameDidChange:(CGRect)frame;
 @end
 
 @interface NgPseudoInputAccessoryViewCoordinator (Privates)

@@ -117,17 +117,17 @@
 - (void)setDelegate:(id<NgPseudoInputAccessoryViewCoordinatorDelegate>)delegate {
   _delegate = delegate;
   _delegateFlags.didSetHeight = delegate && [(id)delegate respondsToSelector:@selector(pseudoInputAccessoryViewCoordinator:didSetHeight:)];
-  _delegateFlags.keyboardFrameDidChange = delegate && [(id)delegate respondsToSelector:@selector(pseudoInputAccessoryViewCoordinator:keyboardFrameDidChangeInteractively:)];
+  _delegateFlags.keyboardFrameDidChange = delegate && [(id)delegate respondsToSelector:@selector(pseudoInputAccessoryViewCoordinator:keyboardFrameDidChange:)];
 }
 - (void)didSetHeight:(CGFloat)height {
   if (_delegateFlags.didSetHeight) [_delegate pseudoInputAccessoryViewCoordinator:self didSetHeight:height];
 }
-- (void)keyboardFrameDidChangeInteractively:(CGRect)frame {
-  if (_delegateFlags.keyboardFrameDidChange) [_delegate pseudoInputAccessoryViewCoordinator:self keyboardFrameDidChangeInteractively:frame];
+- (void)keyboardFrameDidChange:(CGRect)frame {
+  if (_delegateFlags.keyboardFrameDidChange) [_delegate pseudoInputAccessoryViewCoordinator:self keyboardFrameDidChange:frame];
 }
 #pragma mark NgKeyboardInputAccessoryViewDelegate
 - (void)pseudoInputAccessoryView:(NgPseudoInputAccessoryView *)v keyboardFrameDidChange:(CGRect)frame {
-  [self keyboardFrameDidChangeInteractively:frame];
+  [self keyboardFrameDidChange:frame];
 }
 
 #pragma mark Public

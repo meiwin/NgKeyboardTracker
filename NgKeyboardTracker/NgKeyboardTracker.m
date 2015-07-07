@@ -24,6 +24,15 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
   return 0;
 }
 
+NSString * NgAppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState state) {
+  if (state == NgKeyboardTrackerKeyboardAppearanceStateUndefined) return @"undefined";
+  if (state == NgKeyboardTrackerKeyboardAppearanceStateWillShow) return @"will show";
+  if (state == NgKeyboardTrackerKeyboardAppearanceStateShown) return @"shown";
+  if (state == NgKeyboardTrackerKeyboardAppearanceStateWillHide) return @"will hide";
+  if (state == NgKeyboardTrackerKeyboardAppearanceStateHidden) return @"hidden";
+  return @"???";
+}
+
 #pragma mark -
 @interface NgKeyboardTrackerDelegateWrapper : NSObject {
   struct {
@@ -117,6 +126,15 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
     [self getInitialKeyboardInfo];
   }
   return self;
+}
+- (NSString *)description {
+  return [NSString stringWithFormat:@"<NgKeyboardTracker: %p>\n- appearanceState: %@\n- animation duration: %f\n- begin frame: %@\n- end frame: %@\n- current frame: %@"
+          , self
+          , NgAppearanceStateAsString(self.appearanceState)
+          , self.animationDuration
+          , NSStringFromCGRect(self.beginFrame)
+          , NSStringFromCGRect(self.endFrame)
+          , NSStringFromCGRect(self.currentFrame)];
 }
 - (void)dealloc {
   [self stop];
@@ -250,19 +268,15 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
   [self setAnimationCurve:(UIViewAnimationCurve)[info[UIKeyboardAnimationCurveUserInfoKey] integerValue]];
 }
 - (void)onKeyboardWillShow:(NSNotification *)note {
-  [self captureInfo:note.userInfo];
   [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateWillShow];
 }
 - (void)onKeyboardDidShow:(NSNotification *)note {
-  [self captureInfo:note.userInfo];
   [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateShown];
 }
 - (void)onKeyboardWillHide:(NSNotification *)note {
-  [self captureInfo:note.userInfo];
   [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateWillHide];
 }
 - (void)onKeyboardDidHide:(NSNotification *)note {
-  [self captureInfo:note.userInfo];
   [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateHidden];
 }
 
@@ -315,7 +329,7 @@ static inline UIViewAnimationOptions NgAnimationOptionsWithCurve(UIViewAnimation
 
 #pragma mark NgPseudoInputAccessoryViewCoordinatorDelegate
 - (void)pseudoInputAccessoryViewCoordinator:(NgPseudoInputAccessoryViewCoordinator *)coordinator
-        keyboardFrameDidChangeInteractively:(CGRect)frame {
+                     keyboardFrameDidChange:(CGRect)frame {
   
   _currentFrame = frame;
   _animationDuration = 0;

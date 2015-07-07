@@ -9,18 +9,9 @@
 #import "ViewController.h"
 #import "NgKeyboardTracker.h"
 
-NSString * AppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState state) {
-  if (state == NgKeyboardTrackerKeyboardAppearanceStateUndefined) return @"undefined";
-  if (state == NgKeyboardTrackerKeyboardAppearanceStateWillShow) return @"will show";
-  if (state == NgKeyboardTrackerKeyboardAppearanceStateShown) return @"shown";
-  if (state == NgKeyboardTrackerKeyboardAppearanceStateWillHide) return @"will hide";
-  if (state == NgKeyboardTrackerKeyboardAppearanceStateHidden) return @"hidden";
-  return @"???";
-}
-
 NSString * DescriptionFromKeyboardTracker(NgKeyboardTracker * tracker) {
   return [NSString stringWithFormat:@"[%@]\n%@\nvisible: %@"
-          , AppearanceStateAsString(tracker.appearanceState)
+          , NgAppearanceStateAsString(tracker.appearanceState)
           , NSStringFromCGRect(tracker.endFrame)
           , [tracker isKeyboardVisible] ? @"YES" : @"NO" ];
 }
@@ -137,15 +128,7 @@ NSString * DescriptionFromKeyboardTracker(NgKeyboardTracker * tracker) {
 }
 - (void)performUpdate:(NgKeyboardTracker *)tracker {
   _label.text = DescriptionFromKeyboardTracker(tracker);
-  [UIView animateWithDuration:tracker.animationDuration
-                        delay:0
-                      options:tracker.animationOptions
-                   animations:^{
-                     [self layoutTextView];
-                   } completion:nil];
-}
-- (void)keyboardTrackerDidChangeAppearanceState:(NgKeyboardTracker *)tracker {
-  [self performUpdate:tracker];
+  [self layoutTextView];
 }
 - (void)keyboardTrackerDidUpdate:(NgKeyboardTracker *)tracker {
   [self performUpdate:tracker];

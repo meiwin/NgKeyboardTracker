@@ -14,5 +14,9 @@
 - (instancetype)init UNAVAILABLE_ATTRIBUTE;
 - (void)setPseudoInputAccessoryViewHeight:(CGFloat)height;
 - (CGFloat)pseudoInputAccessoryViewHeight;
+/**
+ * If `isActive` is true, it means the pseudo input accessory view managed by this coordinator
+ * is presently attached to keyboard
+ */
 - (BOOL)isActive;
 @end

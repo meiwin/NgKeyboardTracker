@@ -17,6 +17,7 @@ typedef NS_ENUM(int32_t, NgKeyboardTrackerKeyboardAppearanceState) {
   NgKeyboardTrackerKeyboardAppearanceStateShown,
   NgKeyboardTrackerKeyboardAppearanceStateHidden
 };
+NSString * NgAppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState state);
 
 #pragma mark -
 @class NgKeyboardTracker;
