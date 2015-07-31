@@ -3,7 +3,7 @@
 //  NgKeyboardTrackerDemo
 //
 //  Created by Meiwin Fu on 29/6/15.
-//  Copyright (c) 2015 BlockThirty. All rights reserved.
+//  Copyright (c) 2015 Meiwin Fu. All rights reserved.
 //
 
 #import "ViewController.h"
@@ -12,7 +12,7 @@
 NSString * DescriptionFromKeyboardTracker(NgKeyboardTracker * tracker) {
   return [NSString stringWithFormat:@"[%@]\n%@\nvisible: %@"
           , NgAppearanceStateAsString(tracker.appearanceState)
-          , NSStringFromCGRect(tracker.endFrame)
+          , NSStringFromCGRect(tracker.currentFrame)
           , [tracker isKeyboardVisible] ? @"YES" : @"NO" ];
 }
 
@@ -126,12 +126,11 @@ NSString * DescriptionFromKeyboardTracker(NgKeyboardTracker * tracker) {
   };
   
 }
-- (void)performUpdate:(NgKeyboardTracker *)tracker {
-  _label.text = DescriptionFromKeyboardTracker(tracker);
+- (void)keyboardTrackerDidUpdate:(NgKeyboardTracker *)tracker {
   [self layoutTextView];
 }
-- (void)keyboardTrackerDidUpdate:(NgKeyboardTracker *)tracker {
-  [self performUpdate:tracker];
+- (void)keyboardTrackerDidChangeAppearanceState:(NgKeyboardTracker *)tracker {
+  _label.text = DescriptionFromKeyboardTracker(tracker);
 }
 @end
 

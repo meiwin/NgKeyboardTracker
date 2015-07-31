@@ -3,7 +3,7 @@
 //  NgKeyboardTracker
 //
 //  Created by Meiwin Fu on 29/6/15.
-//  Copyright (c) 2015 BlockThirty. All rights reserved.
+//  Copyright (c) 2015 Meiwin Fu. All rights reserved.
 //
 
 #import "NgKeyboardTracker.h"
@@ -193,13 +193,35 @@ NSString * NgAppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState st
   
   [self getInitialKeyboardInfo];
   
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onKeyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onKeyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onKeyboardWillChangeFrame:) name:UIKeyboardWillChangeFrameNotification object:nil];
+  [[NSNotificationCenter defaultCenter]
+   addObserver:self
+   selector:@selector(onKeyboardWillShow:)
+   name:UIKeyboardWillShowNotification object:nil];
   
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onKeyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onKeyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onKeyboardDidChangeFrame:) name:UIKeyboardDidChangeFrameNotification object:nil];
+  [[NSNotificationCenter defaultCenter]
+   addObserver:self
+   selector:@selector(onKeyboardWillHide:)
+   name:UIKeyboardWillHideNotification object:nil];
+  
+  [[NSNotificationCenter defaultCenter]
+   addObserver:self
+   selector:@selector(onKeyboardDidShow:)
+   name:UIKeyboardDidShowNotification object:nil];
+  
+  [[NSNotificationCenter defaultCenter]
+   addObserver:self
+   selector:@selector(onKeyboardDidHide:)
+   name:UIKeyboardDidHideNotification object:nil];
+  
+  [[NSNotificationCenter defaultCenter]
+   addObserver:self
+   selector:@selector(onKeyboardWillChangeFrame:)
+   name:UIKeyboardWillChangeFrameNotification object:nil];
+
+  [[NSNotificationCenter defaultCenter]
+   addObserver:self
+   selector:@selector(onKeyboardDidChangeFrame:)
+   name:UIKeyboardDidChangeFrameNotification object:nil];
 }
 - (void)stop {
   
@@ -225,22 +247,6 @@ NSString * NgAppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState st
     [wrapper didChangeAppearanceState];
   }
   [_lock unlock];
-}
-- (void)updateAppearanceStateIfValid:(NgKeyboardTrackerKeyboardAppearanceState)newState {
-  
-  if (_appearanceState == NgKeyboardTrackerKeyboardAppearanceStateUndefined) {
-    [self updateAppearanceState:newState];
-  } else if (_appearanceState == NgKeyboardTrackerKeyboardAppearanceStateWillShow) {
-    if (newState != NgKeyboardTrackerKeyboardAppearanceStateWillShow) [self updateAppearanceState:newState];
-  } else if (_appearanceState == NgKeyboardTrackerKeyboardAppearanceStateShown) {
-    if (newState != NgKeyboardTrackerKeyboardAppearanceStateWillShow &&
-        newState != NgKeyboardTrackerKeyboardAppearanceStateShown) [self updateAppearanceState:newState];
-  } else if (_appearanceState == NgKeyboardTrackerKeyboardAppearanceStateWillHide) {
-    if (newState != NgKeyboardTrackerKeyboardAppearanceStateWillHide) [self updateAppearanceState:newState];
-  } else if (_appearanceState == NgKeyboardTrackerKeyboardAppearanceStateHidden) {
-    if (newState != NgKeyboardTrackerKeyboardAppearanceStateWillHide &&
-        newState != NgKeyboardTrackerKeyboardAppearanceStateHidden) [self updateAppearanceState:newState];
-  }
 }
 - (BOOL)isKeyboardVisible {
   CGRect intersection = CGRectIntersection([UIScreen mainScreen].bounds, _currentFrame);
@@ -268,16 +274,16 @@ NSString * NgAppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState st
   [self setAnimationCurve:(UIViewAnimationCurve)[info[UIKeyboardAnimationCurveUserInfoKey] integerValue]];
 }
 - (void)onKeyboardWillShow:(NSNotification *)note {
-  [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateWillShow];
+  [self updateAppearanceState:NgKeyboardTrackerKeyboardAppearanceStateWillShow];
 }
 - (void)onKeyboardDidShow:(NSNotification *)note {
-  [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateShown];
+  [self updateAppearanceState:NgKeyboardTrackerKeyboardAppearanceStateShown];
 }
 - (void)onKeyboardWillHide:(NSNotification *)note {
-  [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateWillHide];
+  [self updateAppearanceState:NgKeyboardTrackerKeyboardAppearanceStateWillHide];
 }
 - (void)onKeyboardDidHide:(NSNotification *)note {
-  [self updateAppearanceStateIfValid:NgKeyboardTrackerKeyboardAppearanceStateHidden];
+  [self updateAppearanceState:NgKeyboardTrackerKeyboardAppearanceStateHidden];
 }
 
 - (void)onKeyboardWillChangeFrame:(NSNotification *)note {
