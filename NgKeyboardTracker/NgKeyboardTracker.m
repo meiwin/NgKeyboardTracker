@@ -325,8 +325,7 @@ NSString * NgAppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState st
   NSParameterAssert(view);
   if (CGRectEqualToRect(CGRectZero, frame))
     return CGRectZero;
-  
-  return [[UIApplication sharedApplication].keyWindow convertRect:frame toView:view];
+  return [view convertRect:frame fromView:nil];
 }
 - (CGRect)keyboardCurrentFrameForView:(UIView *)view {
 

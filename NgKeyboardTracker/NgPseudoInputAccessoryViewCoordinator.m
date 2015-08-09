@@ -67,7 +67,8 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
   if (object == self.superview && [keyPath isEqualToString:[self selectorForSuperview]]) {
-    [self keyboardFrameDidChange:self.superview.frame];
+    CGRect kbframe = [self.superview convertRect:self.superview.bounds toView:nil];
+    [self keyboardFrameDidChange:kbframe];
   }
 }
 - (void)dealloc
