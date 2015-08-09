@@ -2,6 +2,8 @@
 
 Objective-c library for tracking keyboard in iOS apps.
 
+![](https://github.com/meiwin/ngkeyboardtracker/blob/master/ngkeyboardtracker.gif)
+
 ## Adding to your project
 
 If you are using Cocoapods, add to your Podfile:
