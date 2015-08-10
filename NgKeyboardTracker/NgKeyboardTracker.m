@@ -168,7 +168,7 @@ NSString * NgAppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState st
   UIView * keyboardView = [self getKeyboardView];
   if (keyboardView) {
     _appearanceState = NgKeyboardTrackerKeyboardAppearanceStateShown;
-    _beginFrame = [keyboardView convertRect:keyboardView.bounds toView:[UIApplication sharedApplication].keyWindow];
+    _beginFrame = [keyboardView convertRect:keyboardView.bounds toView:nil];
     _endFrame = _beginFrame;
     [self setAnimationCurve:0];
     _animationDuration = 0;
