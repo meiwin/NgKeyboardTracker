@@ -9,7 +9,7 @@ Objective-c library for tracking keyboard in iOS apps.
 If you are using Cocoapods, add to your Podfile:
 
 ```ruby
-pod NgKeyboardTracker
+pod 'NgKeyboardTracker'
 ```
 
 To manually add to your projects:
