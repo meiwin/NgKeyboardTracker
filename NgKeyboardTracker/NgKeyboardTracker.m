@@ -190,6 +190,7 @@ NSString * NgAppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState st
 - (void)start {
   
   if (_tracking) return;
+  _tracking = YES;
   
   [self getInitialKeyboardInfo];
   
@@ -226,6 +227,7 @@ NSString * NgAppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState st
 - (void)stop {
   
   if (!_tracking) return;
+  _tracking = NO;
   
   [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -336,6 +338,7 @@ NSString * NgAppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState st
 - (void)pseudoInputAccessoryViewCoordinator:(NgPseudoInputAccessoryViewCoordinator *)coordinator
                      keyboardFrameDidChange:(CGRect)frame {
   
+  if (!_tracking) return;
   _currentFrame = frame;
   _animationDuration = 0;
   [self notifyAllDelegates];
