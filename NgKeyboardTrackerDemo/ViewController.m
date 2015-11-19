@@ -131,6 +131,7 @@ NSString * DescriptionFromKeyboardTracker(NgKeyboardTracker * tracker) {
 }
 - (void)keyboardTrackerDidChangeAppearanceState:(NgKeyboardTracker *)tracker {
   _label.text = DescriptionFromKeyboardTracker(tracker);
+  [self layoutTextView];
 }
 @end
 

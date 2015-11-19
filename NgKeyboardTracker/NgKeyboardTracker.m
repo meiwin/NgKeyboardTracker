@@ -251,6 +251,7 @@ NSString * NgAppearanceStateAsString(NgKeyboardTrackerKeyboardAppearanceState st
   [_lock unlock];
 }
 - (BOOL)isKeyboardVisible {
+  if (self.appearanceState == NgKeyboardTrackerKeyboardAppearanceStateHidden) return NO;
   CGRect intersection = CGRectIntersection([UIScreen mainScreen].bounds, _currentFrame);
   return intersection.size.height - _inputAccessoryViewHeight > 0;
 }
